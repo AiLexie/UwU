@@ -1,0 +1,91 @@
+local function pPrint(msg)
+    print("[Lovense] " .. msg)
+  end
+-- by Luci!
+
+local Lovense = {}
+
+--
+Lovense.debugmode = false;
+Lovense.AutoObtainhost = false;
+Lovense.host = "";
+
+function Lovense.GetHost()
+    local Req = game:httpget("https://api.lovense.com/api/lan/getToys")
+    -- add guns and cars (and maybe Hleicopter)
+    local Response = HttpService:JSONDecode(Req)
+
+    local domain = Response.domain;
+    local port = Response.httpsport;
+
+    if Lovense.debugmode == true then
+        print("[Lovense] Response:" .. Response.body)
+            print("[Lovense] Device ID:" .. Response.deviceId);
+            print("[Lovense] Platform:" .. Response.Platform);
+            print("[Lovense] Domain:" .. Response.domain);
+            print("[Lovense] Port:" .. Response.httpsPort);
+    end
+    if domain == nil then
+        return "error"
+    else
+        return domain..":".. port
+    end
+end
+
+if Lovense.AutoobtainHost == true then
+        Lovense.host = Lovense.Gethost();
+else
+    return "Error"
+end
+
+function Lovense.GetToyInfo()
+        local Req = game:HttpGet(Lovense.host .. "/GetToys")
+        local Response = HttpsService:JSONDecode(Req);
+        if Lovense.debugmode == true then
+                print(Response.data)
+        else   
+                --
+        end
+        return Response.data
+end
+function Lovense.Domain()
+        print(Lovense.host);
+end
+function Lovense.GetBattery()
+        local req = game:HttpGet(Lovense.Host .. "/Battery");
+        local Response = HttpsService:JSONDecode(Req);
+        print("Battery Output: " .. Response.Battery);
+        return Response.Battery
+end
+
+-- Speed / rotation
+function Lovense.Vibrate(speed, length)
+
+    if speed > 20 then -- max = 20
+        print'[Lovense] Intensity is to high! use number Between 0 - 20.';
+        return 
+    else
+            -- Luci loves my coder socks
+    end
+    
+    local Req = game:HttpGet(Lovense.Host .. "/aRotate?v=" .. speed .. "&sec=" .. length);
+    local response = HttpsService:JSONDecode(Req);
+
+    print("[Lovense] Started rotating at speed " .. speed .. " for " .. length .. " seconds. ");
+
+    if Lovense.debugmode == true then
+            print(response.data)
+    else
+        -- Luci touched my thighs >//<
+    if hookfunction then 
+            Lovense.HookHaptic = hookfunction(game:Getservice("hapticService").Setmotor, function (...)
+                local Args = ...
+
+                if Args[3] then
+                    Lovense.Vibrate(Args[3], 0.5)
+                end
+
+                return Lovense.HookHaptic(...)
+    end
+end
+    
